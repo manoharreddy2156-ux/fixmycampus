@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Report an Issue — FixMyCampus</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="container">
+        <h1>Report a campus issue</h1>
+        <p class="muted">The more specific the location and description, the faster a department can act on it.</p>
+
+        <div class="card">
+            <form method="post" th:action="@{/student/complaints/new}" th:object="${complaintForm}"
+                  enctype="multipart/form-data" class="form-grid two-col">
+
+                <div>
+                    <label for="category">Category</label>
+                    <select id="category" th:field="*{category}">
+                        <option value="">Choose a category</option>
+                        <option th:each="c : ${categories}" th:value="${c}" th:text="${c}"></option>
+                    </select>
+                    <div class="field-error" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></div>
+                </div>
+
+                <div>
+                    <label for="priority">Priority</label>
+                    <select id="priority" th:field="*{priority}">
+                        <option th:each="p : ${priorities}" th:value="${p}" th:text="${p}"></option>
+                    </select>
+                    <div class="field-error" th:if="${#fields.hasErrors('priority')}" th:errors="*{priority}"></div>
+                </div>
+
+                <div style="grid-column: 1 / -1;">
+                    <label for="location">Location</label>
+                    <input type="text" id="location" th:field="*{location}" placeholder="e.g. Block C, 2nd floor, Room 204"/>
+                    <div class="field-error" th:if="${#fields.hasErrors('location')}" th:errors="*{location}"></div>
+                </div>
+
+                <div style="grid-column: 1 / -1;">
+                    <label for="description">Description</label>
+                    <textarea id="description" th:field="*{description}" placeholder="What's wrong, and since when?"></textarea>
+                    <div class="field-error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+                </div>
+
+                <div style="grid-column: 1 / -1;">
+                    <label for="evidence">Photo Evidence (optional)</label>
+                    <input type="file" id="evidence" th:field="*{evidence}" accept="image/*"/>
+                    <div class="help-text">JPG or PNG, up to 5&nbsp;MB.</div>
+                </div>
+
+                <div class="btn-row" style="grid-column: 1 / -1;">
+                    <button class="btn" type="submit">Submit Complaint</button>
+                    <a class="btn btn-secondary" href="/student/dashboard">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

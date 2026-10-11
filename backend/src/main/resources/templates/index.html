@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>FixMyCampus — Report and Track Campus Issues</title>
+    <meta name="description" content="FixMyCampus lets students report broken lights, leaks, Wi-Fi failures and other campus issues in seconds, and track every complaint from Submitted to Closed."/>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="container">
+        <section class="hero">
+            <h1>Every campus problem deserves a paper trail — and a fix.</h1>
+            <p>FixMyCampus turns broken lights, leaking taps, dead Wi-Fi and damaged furniture into a
+               transparent, trackable ticket — from the moment it's reported to the moment it's resolved.</p>
+            <div class="btn-row" style="justify-content:center">
+                <a class="btn" href="/register">Report an Issue</a>
+                <a class="btn btn-secondary" href="/login">I already have an account</a>
+            </div>
+            <p class="muted" style="margin-top:0.8rem">
+                New here? <a href="/preview.html">Try a quick interactive preview</a> — no login needed,
+                walks through Student, Admin and Department views with sample data.
+            </p>
+        </section>
+
+        <section class="feature-grid" aria-label="Key features">
+            <article class="card">
+                <h3>Report in seconds</h3>
+                <p class="muted">Pick a category, name the location, describe the problem and attach a photo
+                   — on any phone, tablet or laptop.</p>
+            </article>
+            <article class="card">
+                <h3>Track it live</h3>
+                <p class="muted">Follow your complaint through Submitted, Assigned, In Progress, Resolved
+                   and Closed.</p>
+            </article>
+            <article class="card">
+                <h3>Built for the whole campus</h3>
+                <p class="muted">Admins search, filter, prioritise and route every issue to the right
+                   department, with a full audit trail.</p>
+            </article>
+        </section>
+
+        <section class="card" aria-labelledby="how-it-works">
+            <h2 id="how-it-works">How it works</h2>
+            <ol>
+                <li>Student reports an issue with category, location, description and priority.</li>
+                <li>Admin reviews it and assigns it to the right department.</li>
+                <li>The department resolves the issue on the ground.</li>
+                <li>Status moves from Submitted all the way to Closed, with the student notified at every step.</li>
+            </ol>
+        </section>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title th:text="'Complaint #' + ${complaint.id} + ' — FixMyCampus Admin'">Complaint</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="container">
+        <a class="muted" href="/admin/dashboard">&larr; Back to dashboard</a>
+
+        <div class="card" style="margin-top:0.8rem;">
+            <div class="complaint-top">
+                <div>
+                    <h1 th:text="${complaint.category} + ' — ' + ${complaint.location}" style="margin-bottom:0.2rem"></h1>
+                    <div class="complaint-meta"
+                         th:text="'Reported by ' + ${complaint.student.name} + ' (' + ${complaint.student.rollNo} + ') on ' + ${#temporals.format(complaint.dateReported, 'dd MMM yyyy, HH:mm')}"></div>
+                </div>
+                <div>
+                    <span th:class="'badge badge-' + ${complaint.status}" th:text="${complaint.status}"></span>
+                    <span th:class="'badge badge-priority-' + ${complaint.priority}" th:text="${complaint.priority}"></span>
+                </div>
+            </div>
+
+            <p style="margin-top:1rem" th:text="${complaint.description}"></p>
+            <p class="muted" th:text="'Student email: ' + ${complaint.student.email} + (${complaint.student.phone} != null ? ' · ' + ${complaint.student.phone} : '')"></p>
+
+            <img th:if="${complaint.imagePath != null}" class="evidence-thumb"
+                 th:src="@{'/uploads/' + ${complaint.imagePath}}" alt="Evidence photo submitted by student"/>
+        </div>
+
+        <div class="card">
+            <h2>Admin Actions</h2>
+            <div class="form-grid two-col">
+
+                <form method="post" th:action="@{/admin/complaints/{id}/assign(id=${complaint.id})}">
+                    <label for="departmentId">Assign Department</label>
+                    <select id="departmentId" name="departmentId">
+                        <option th:each="d : ${departments}" th:value="${d.id}" th:text="${d.name}"
+                                th:selected="${complaint.department != null and complaint.department.id == d.id}"></option>
+                    </select>
+                    <div class="btn-row"><button class="btn btn-secondary" type="submit">Assign</button></div>
+                </form>
+
+                <form method="post" th:action="@{/admin/complaints/{id}/priority(id=${complaint.id})}">
+                    <label for="priority">Set Priority</label>
+                    <select id="priority" name="priority">
+                        <option th:each="p : ${priorities}" th:value="${p}" th:text="${p}"
+                                th:selected="${p == complaint.priority}"></option>
+                    </select>
+                    <div class="btn-row"><button class="btn btn-secondary" type="submit">Update Priority</button></div>
+                </form>
+
+                <form method="post" th:action="@{/admin/complaints/{id}/status(id=${complaint.id})}" style="grid-column:1 / -1">
+                    <label for="status">Update Status</label>
+                    <select id="status" name="status">
+                        <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}"
+                                th:selected="${s == complaint.status}"></option>
+                    </select>
+                    <label for="remarks" style="margin-top:0.6rem">Remarks (optional)</label>
+                    <input type="text" id="remarks" name="remarks" placeholder="e.g. Electrician visited, awaiting spare part"/>
+                    <div class="btn-row"><button class="btn" type="submit">Update Status</button></div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Status History</h2>
+            <div class="lifecycle">
+                <div th:each="h : ${history}" class="lifecycle-step done">
+                    <div class="lifecycle-dot"></div>
+                    <div>
+                        <div th:text="${h.status}" style="font-weight:600"></div>
+                        <div class="lifecycle-time"
+                             th:text="${#temporals.format(h.updatedOn, 'dd MMM, HH:mm')} + ' · ' + ${h.updatedBy.name}"></div>
+                        <div class="muted" th:if="${h.remarks != null}" th:text="${h.remarks}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

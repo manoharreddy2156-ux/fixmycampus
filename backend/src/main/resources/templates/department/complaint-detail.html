@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title th:text="'Complaint #' + ${complaint.id} + ' — FixMyCampus'">Complaint</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="container">
+        <a class="muted" href="/department/dashboard">&larr; Back to my queue</a>
+
+        <div class="card" style="margin-top:0.8rem;">
+            <div class="complaint-top">
+                <div>
+                    <h1 th:text="${complaint.category} + ' — ' + ${complaint.location}" style="margin-bottom:0.2rem"></h1>
+                    <div class="complaint-meta"
+                         th:text="'Reported by ' + ${complaint.student.name} + ' on ' + ${#temporals.format(complaint.dateReported, 'dd MMM yyyy, HH:mm')}"></div>
+                </div>
+                <div>
+                    <span th:class="'badge badge-' + ${complaint.status}" th:text="${complaint.status}"></span>
+                    <span th:class="'badge badge-priority-' + ${complaint.priority}" th:text="${complaint.priority}"></span>
+                </div>
+            </div>
+
+            <p style="margin-top:1rem" th:text="${complaint.description}"></p>
+
+            <img th:if="${complaint.imagePath != null}" class="evidence-thumb"
+                 th:src="@{'/uploads/' + ${complaint.imagePath}}" alt="Evidence photo submitted by student"/>
+        </div>
+
+        <div class="card" th:if="${complaint.status.name() != 'RESOLVED' and complaint.status.name() != 'CLOSED'}">
+            <h2>Update Work Status</h2>
+            <form method="post" th:action="@{/department/complaints/{id}/status(id=${complaint.id})}">
+                <label for="status">Status</label>
+                <select id="status" name="status">
+                    <option value="IN_PROGRESS">IN_PROGRESS</option>
+                    <option value="RESOLVED">RESOLVED</option>
+                </select>
+                <label for="remarks" style="margin-top:0.6rem">Remarks</label>
+                <input type="text" id="remarks" name="remarks" placeholder="e.g. Replaced the tube light, tested working"/>
+                <div class="btn-row"><button class="btn" type="submit">Update</button></div>
+            </form>
+        </div>
+
+        <div class="card" th:if="${complaint.status.name() == 'RESOLVED' or complaint.status.name() == 'CLOSED'}">
+            <p class="muted" style="margin:0">
+                This complaint is marked <strong th:text="${complaint.status}"></strong> — no further action needed
+                from your department. Closing is confirmed by the student or admin.
+            </p>
+        </div>
+
+        <div class="card">
+            <h2>Status History</h2>
+            <div class="lifecycle">
+                <div th:each="h : ${history}" class="lifecycle-step done">
+                    <div class="lifecycle-dot"></div>
+                    <div>
+                        <div th:text="${h.status}" style="font-weight:600"></div>
+                        <div class="lifecycle-time"
+                             th:text="${#temporals.format(h.updatedOn, 'dd MMM, HH:mm')} + ' · ' + ${h.updatedBy.name}"></div>
+                        <div class="muted" th:if="${h.remarks != null}" th:text="${h.remarks}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

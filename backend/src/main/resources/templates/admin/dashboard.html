@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Admin Dashboard — FixMyCampus</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="container">
+        <h1>Campus Overview</h1>
+
+        <div class="stat-grid" th:if="${submittedCount != null}">
+            <div class="stat-card"><div class="num" th:text="${submittedCount}"></div><div class="label">Submitted</div></div>
+            <div class="stat-card"><div class="num" th:text="${assignedCount}"></div><div class="label">Assigned</div></div>
+            <div class="stat-card"><div class="num" th:text="${inProgressCount}"></div><div class="label">In Progress</div></div>
+            <div class="stat-card"><div class="num" th:text="${resolvedCount}"></div><div class="label">Resolved</div></div>
+            <div class="stat-card"><div class="num" th:text="${closedCount}"></div><div class="label">Closed</div></div>
+        </div>
+
+        <div class="card" th:if="${departmentStats != null}">
+            <h2>Department Work Status</h2>
+            <p class="muted">How each department is keeping up with what's been assigned to it.</p>
+
+            <table class="data-table" th:if="${not #lists.isEmpty(departmentStats)}">
+                <thead>
+                    <tr>
+                        <th>Department</th>
+                        <th>Assigned</th>
+                        <th>In Progress</th>
+                        <th>Resolved</th>
+                        <th>Closed</th>
+                        <th>Open Now</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="ds : ${departmentStats}">
+                        <td>
+                            <a th:href="@{/admin/complaints(deptId=${ds.departmentId()})}" th:text="${ds.departmentName()}"></a>
+                        </td>
+                        <td th:text="${ds.assigned()}"></td>
+                        <td th:text="${ds.inProgress()}"></td>
+                        <td th:text="${ds.resolved()}"></td>
+                        <td th:text="${ds.closed()}"></td>
+                        <td>
+                            <strong th:text="${ds.openCount()}" th:style="${ds.openCount() > 0} ? 'color:#c98a12' : ''"></strong>
+                        </td>
+                        <td th:text="${ds.total()}"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p class="muted" th:if="${#lists.isEmpty(departmentStats)}" style="margin:0">No departments set up yet.</p>
+        </div>
+
+        <form class="filter-bar" method="get" th:action="@{/admin/complaints}">
+            <div>
+                <label for="category">Category</label>
+                <select id="category" name="category">
+                    <option value="">All</option>
+                    <option th:each="c : ${categories}" th:value="${c}" th:text="${c}"
+                            th:selected="${param.category != null and param.category[0] == c.name()}"></option>
+                </select>
+            </div>
+            <div>
+                <label for="status">Status</label>
+                <select id="status" name="status">
+                    <option value="">All</option>
+                    <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}"
+                            th:selected="${param.status != null and param.status[0] == s.name()}"></option>
+                </select>
+            </div>
+            <div>
+                <label for="priority">Priority</label>
+                <select id="priority" name="priority">
+                    <option value="">All</option>
+                    <option th:each="p : ${priorities}" th:value="${p}" th:text="${p}"
+                            th:selected="${param.priority != null and param.priority[0] == p.name()}"></option>
+                </select>
+            </div>
+            <div>
+                <label for="deptId">Department</label>
+                <select id="deptId" name="deptId">
+                    <option value="">All</option>
+                    <option th:each="d : ${departments}" th:value="${d.id}" th:text="${d.name}"
+                            th:selected="${param.deptId != null and param.deptId[0] == d.id.toString()}"></option>
+                </select>
+            </div>
+            <div>
+                <label for="keyword">Search</label>
+                <input type="text" id="keyword" name="keyword" placeholder="location or description" th:value="${param.keyword}"/>
+            </div>
+            <div>
+                <button class="btn btn-secondary" type="submit">Filter</button>
+            </div>
+        </form>
+
+        <div class="complaint-list" th:if="${not #lists.isEmpty(complaints)}">
+            <a th:each="c : ${complaints}" th:href="@{/admin/complaints/{id}(id=${c.id})}"
+               th:class="'complaint-card priority-' + ${c.priority}" style="display:block;color:inherit">
+                <div class="complaint-top">
+                    <div>
+                        <div class="complaint-title" th:text="${c.category} + ' — ' + ${c.location}"></div>
+                        <div class="complaint-meta"
+                             th:text="${c.student.name} + ' (' + ${c.student.rollNo} + ') · ' + ${#temporals.format(c.dateReported, 'dd MMM yyyy, HH:mm')}"></div>
+                    </div>
+                    <div>
+                        <span th:class="'badge badge-' + ${c.status}" th:text="${c.status}"></span>
+                        <span th:class="'badge badge-priority-' + ${c.priority}" th:text="${c.priority}"></span>
+                    </div>
+                </div>
+                <div class="complaint-desc" th:text="${c.description}"></div>
+                <div class="muted" th:if="${c.department != null}" th:text="'Assigned: ' + ${c.department.name}"></div>
+            </a>
+        </div>
+
+        <div class="card" th:if="${#lists.isEmpty(complaints)}">
+            <p class="muted" style="margin:0">No complaints match these filters.</p>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

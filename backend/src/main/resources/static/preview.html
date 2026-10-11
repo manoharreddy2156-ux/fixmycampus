@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>FixMyCampus — Live Preview</title>
+<style>
+:root{--ink:#16181d;--dark:#353a45;--mid:#68707e;--line:#dde1e6;--bg:#f5f6f8;--card:#fff;
+--accent:#2b4ced;--accent-dark:#1d35b4;--danger:#c0392b;--warn:#c98a12;--radius:10px;
+padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Segoe UI,Roboto,Arial,sans-serif;line-height:1.5}
+header{background:var(--ink);color:#fff;padding:.8rem 1.2rem;position:sticky;top:0;z-index:5}
+header .inner{max-width:1000px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.6rem}
+.brand{font-weight:700;font-size:1.15rem}.brand span{color:#9fb0ff}
+.tabs{display:flex;gap:.4rem;flex-wrap:wrap}
+.tab{background:none;border:1px solid rgba(255,255,255,.3);color:#d7dbe8;border-radius:7px;padding:.35rem .8rem;cursor:pointer;font-size:.85rem}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+main{max-width:1000px;margin:0 auto;padding:1.2rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:1rem;margin-bottom:1rem;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+h1{font-size:1.4rem;margin:.2rem 0 .8rem}h2{font-size:1.05rem;margin:0 0 .6rem}
+.muted{color:var(--mid);font-size:.85rem}
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem;margin-bottom:1rem}
+@media(min-width:620px){.stat-grid{grid-template-columns:repeat(5,1fr)}}
+.stat{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:.7rem;text-align:center}
+.stat b{display:block;font-size:1.3rem}.stat span{font-size:.7rem;color:var(--mid);text-transform:uppercase}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th,td{text-align:left;padding:.45rem .5rem;border-bottom:1px solid var(--line)}
+th{color:var(--mid);font-size:.72rem;text-transform:uppercase}
+.badge{display:inline-block;padding:.15rem .55rem;border-radius:999px;font-size:.68rem;font-weight:700;text-transform:uppercase}
+.b-SUBMITTED{background:#e7e9ee;color:var(--dark)}.b-ASSIGNED{background:#dde6ff;color:#1d35b4}
+.b-IN_PROGRESS{background:#fff1d6;color:#8a5c00}.b-RESOLVED{background:#d9f3e4;color:#15703f}.b-CLOSED{background:var(--ink);color:#fff}
+.p-LOW{background:#eef0f3;color:var(--dark)}.p-MEDIUM{background:#fff1d6;color:#8a5c00}
+.p-HIGH{background:#ffe3cf;color:#9a4a0a}.p-URGENT{background:#fbdbd6;color:var(--danger)}
+.item{border:1px solid var(--line);border-left:5px solid var(--mid);border-radius:var(--radius);padding:.8rem;margin-bottom:.6rem}
+.item-top{display:flex;justify-content:space-between;gap:.5rem;flex-wrap:wrap;align-items:start}
+.title{font-weight:700}.meta{font-size:.78rem;color:var(--mid)}
+select,input,textarea{width:100%;padding:.5rem .6rem;border:1px solid var(--line);border-radius:7px;font-size:.88rem;font-family:inherit}
+label{font-weight:600;font-size:.82rem;display:block;margin:.5rem 0 .2rem}
+.btn{border:none;border-radius:7px;padding:.5rem 1rem;font-weight:600;cursor:pointer;background:var(--accent);color:#fff;font-size:.85rem}
+.btn:hover{background:var(--accent-dark)}
+.row{display:flex;gap:.6rem;flex-wrap:wrap;align-items:end}
+.row>div{flex:1;min-width:140px}
+.dept-select{max-width:280px;margin-bottom:1rem}
+</style>
+</head>
+<body>
+<header>
+  <div class="inner">
+    <div class="brand">Fix<span>MyCampus</span> — Preview</div>
+    <div class="tabs">
+      <button class="tab" data-view="student">Student</button>
+      <button class="tab" data-view="admin">Admin</button>
+      <button class="tab" data-view="department">Department</button>
+    </div>
+  </div>
+</header>
+<div style="background:#fff1d6;color:#8a5c00;text-align:center;font-size:.8rem;padding:.5rem 1rem">
+  Demo preview with sample data only — not connected to the real database. <a href="/" style="color:#8a5c00;text-decoration:underline">Go to the real app →</a>
+</div>
+<main id="app"></main>
+
+<script>
+const CATS=["ELECTRICAL","PLUMBING","FURNITURE","CLEANLINESS","WIFI_NETWORK","CLASSROOM","LABORATORY"];
+const PRI=["LOW","MEDIUM","HIGH","URGENT"];
+const STAT=["SUBMITTED","ASSIGNED","IN_PROGRESS","RESOLVED","CLOSED"];
+const depts=["Electrical Maintenance","Plumbing & Civil","IT / Network Support","Housekeeping"];
+let complaints=[
+ {id:1,cat:"ELECTRICAL",loc:"Block C, Room 204",desc:"Tube light flickering for a week.",pri:"HIGH",status:"IN_PROGRESS",dept:"Electrical Maintenance",student:"A. Sharma"},
+ {id:2,cat:"WIFI_NETWORK",loc:"Library, 2nd floor",desc:"Wi-Fi drops every evening after 7pm.",pri:"URGENT",status:"ASSIGNED",dept:"IT / Network Support",student:"R. Mehta"},
+ {id:3,cat:"PLUMBING",loc:"Hostel B washroom",desc:"Tap leaking continuously.",pri:"MEDIUM",status:"RESOLVED",dept:"Plumbing & Civil",student:"S. Nair"},
+ {id:4,cat:"CLEANLINESS",loc:"Cafeteria",desc:"Trash not cleared since morning.",pri:"LOW",status:"SUBMITTED",dept:null,student:"A. Sharma"},
+];
+let nextId=5, view="student", myDept=depts[0];
+
+function badge(cls,val){return `<span class="badge ${cls}-${val}">${val}</span>`}
+function card(c){return `<div class="item">
+  <div class="item-top"><div><div class="title">${c.cat} — ${c.loc}</div>
+  <div class="meta">${c.student}${c.dept?' · '+c.dept:''}</div></div>
+  <div>${badge('b',c.status)} ${badge('p',c.pri)}</div></div>
+  <div style="margin-top:.4rem;font-size:.88rem">${c.desc}</div></div>`}
+
+function render(){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.view===view));
+  const app=document.getElementById('app');
+  if(view==='student') app.innerHTML=studentView();
+  if(view==='admin') app.innerHTML=adminView();
+  if(view==='department') app.innerHTML=deptView();
+  wire();
+}
+
+function studentView(){
+  const mine=complaints.filter(c=>c.student==="A. Sharma");
+  return `<h1>My Complaints</h1>
+  <div class="card"><h2>Report a New Issue</h2>
+    <div class="row">
+      <div><label>Category</label><select id="f-cat">${CATS.map(c=>`<option>${c}</option>`).join('')}</select></div>
+      <div><label>Priority</label><select id="f-pri">${PRI.map(p=>`<option>${p}</option>`).join('')}</select></div>
+    </div>
+    <label>Location</label><input id="f-loc" placeholder="e.g. Block C, Room 204"/>
+    <label>Description</label><textarea id="f-desc" rows="2" placeholder="What's wrong?"></textarea>
+    <div style="margin-top:.6rem"><button class="btn" id="submitBtn">Submit Complaint</button></div>
+  </div>
+  <div class="card"><h2>Status</h2>${mine.map(card).join('')||'<p class="muted">No complaints yet.</p>'}</div>`;
+}
+
+function adminView(){
+  const counts={};STAT.forEach(s=>counts[s]=complaints.filter(c=>c.status===s).length);
+  const deptStats=depts.map(d=>{
+    const dc=complaints.filter(c=>c.dept===d);
+    const a=dc.filter(c=>c.status==='ASSIGNED').length, ip=dc.filter(c=>c.status==='IN_PROGRESS').length,
+          r=dc.filter(c=>c.status==='RESOLVED').length, cl=dc.filter(c=>c.status==='CLOSED').length;
+    return {d,a,ip,r,cl,open:a+ip,total:dc.length};
+  });
+  return `<h1>Campus Overview</h1>
+  <div class="stat-grid">${STAT.map(s=>`<div class="stat"><b>${counts[s]}</b><span>${s.replace('_',' ')}</span></div>`).join('')}</div>
+  <div class="card"><h2>Department Work Status</h2>
+    <table><thead><tr><th>Department</th><th>Assigned</th><th>In Progress</th><th>Resolved</th><th>Closed</th><th>Open</th><th>Total</th></tr></thead>
+    <tbody>${deptStats.map(s=>`<tr><td>${s.d}</td><td>${s.a}</td><td>${s.ip}</td><td>${s.r}</td><td>${s.cl}</td>
+      <td style="${s.open?'color:var(--warn);font-weight:700':''}">${s.open}</td><td>${s.total}</td></tr>`).join('')}</tbody></table>
+  </div>
+  <div class="card"><h2>All Complaints</h2>${complaints.map(c=>`<div class="item">
+    <div class="item-top"><div><div class="title">${c.cat} — ${c.loc}</div><div class="meta">${c.student}</div></div>
+    <div>${badge('b',c.status)} ${badge('p',c.pri)}</div></div>
+    <div style="margin-top:.4rem;font-size:.88rem">${c.desc}</div>
+    <div class="row" style="margin-top:.6rem">
+      <div><label>Assign Department</label><select data-assign="${c.id}">
+        <option value="">— none —</option>${depts.map(d=>`<option ${c.dept===d?'selected':''}>${d}</option>`).join('')}</select></div>
+      <div><label>Status</label><select data-status="${c.id}">
+        ${STAT.map(s=>`<option ${c.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
+    </div></div>`).join('')}
+  </div>`;
+}
+
+function deptView(){
+  const mine=complaints.filter(c=>c.dept===myDept);
+  return `<h1>Department Queue</h1>
+  <label>Viewing as</label>
+  <select id="deptPicker" class="dept-select">${depts.map(d=>`<option ${d===myDept?'selected':''}>${d}</option>`).join('')}</select>
+  <div class="card">${mine.length?mine.map(c=>`<div class="item">
+    <div class="item-top"><div><div class="title">${c.cat} — ${c.loc}</div><div class="meta">${c.student}</div></div>
+    <div>${badge('b',c.status)} ${badge('p',c.pri)}</div></div>
+    <div style="margin-top:.4rem;font-size:.88rem">${c.desc}</div>
+    ${c.status!=='RESOLVED'&&c.status!=='CLOSED'?`<div class="row" style="margin-top:.6rem">
+      <div><button class="btn" data-progress="${c.id}" style="background:var(--warn)">Mark In Progress</button></div>
+      <div><button class="btn" data-resolve="${c.id}" style="background:#1f8a56">Mark Resolved</button></div>
+    </div>`:'<p class="muted" style="margin:.5rem 0 0">Closing is confirmed by admin/student.</p>'}
+    </div>`).join(''):'<p class="muted">Nothing assigned to this department.</p>'}
+  </div>`;
+}
+
+function wire(){
+  document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{view=t.dataset.view;render();});
+  const sb=document.getElementById('submitBtn');
+  if(sb) sb.onclick=()=>{
+    const loc=document.getElementById('f-loc').value.trim();
+    const desc=document.getElementById('f-desc').value.trim();
+    if(!loc||!desc){alert('Please fill in location and description.');return;}
+    complaints.push({id:nextId++,cat:document.getElementById('f-cat').value,loc,desc,
+      pri:document.getElementById('f-pri').value,status:"SUBMITTED",dept:null,student:"A. Sharma"});
+    render();
+  };
+  document.querySelectorAll('[data-assign]').forEach(s=>s.onchange=()=>{
+    const c=complaints.find(x=>x.id==s.dataset.assign);
+    c.dept=s.value||null; if(c.dept&&c.status==='SUBMITTED') c.status='ASSIGNED'; render();
+  });
+  document.querySelectorAll('[data-status]').forEach(s=>s.onchange=()=>{
+    complaints.find(x=>x.id==s.dataset.status).status=s.value; render();
+  });
+  const dp=document.getElementById('deptPicker');
+  if(dp) dp.onchange=()=>{myDept=dp.value;render();};
+  document.querySelectorAll('[data-progress]').forEach(b=>b.onclick=()=>{
+    complaints.find(x=>x.id==b.dataset.progress).status='IN_PROGRESS'; render();
+  });
+  document.querySelectorAll('[data-resolve]').forEach(b=>b.onclick=()=>{
+    complaints.find(x=>x.id==b.dataset.resolve).status='RESOLVED'; render();
+  });
+}
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<header xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+        th:fragment="header" class="site-header">
+    <div class="inner">
+        <a class="brand" href="/"><span>Fix</span>MyCampus</a>
+        <nav class="nav-links">
+            <div sec:authorize="!isAuthenticated()">
+                <a href="/login">Login</a>
+                &nbsp;·&nbsp;
+                <a href="/register">Register</a>
+            </div>
+            <div sec:authorize="hasRole('STUDENT')" class="nav-links">
+                <a href="/student/dashboard">My Complaints</a>
+                <a href="/student/complaints/new">Report an Issue</a>
+                <form method="post" th:action="@{/logout}" style="margin:0">
+                    <button type="submit" class="btn-ghost">Logout</button>
+                </form>
+            </div>
+            <div sec:authorize="hasRole('ADMIN')" class="nav-links">
+                <a href="/admin/dashboard">Dashboard</a>
+                <a href="/admin/department-users">Department Accounts</a>
+                <form method="post" th:action="@{/logout}" style="margin:0">
+                    <button type="submit" class="btn-ghost">Logout</button>
+                </form>
+            </div>
+            <div sec:authorize="hasRole('DEPARTMENT_STAFF')" class="nav-links">
+                <a href="/department/dashboard">My Queue</a>
+                <form method="post" th:action="@{/logout}" style="margin:0">
+                    <button type="submit" class="btn-ghost">Logout</button>
+                </form>
+            </div>
+        </nav>
+    </div>
+</header>

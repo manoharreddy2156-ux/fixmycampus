@@ -1,0 +1,8 @@
+target/
+.git/
+.gitignore
+uploads/*
+!uploads/.gitkeep
+.idea/
+*.iml
+.mvn/

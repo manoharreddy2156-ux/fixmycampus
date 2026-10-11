@@ -1,0 +1,353 @@
+/* =========================================================
+   FixMyCampus — hand-written vanilla CSS. No framework.
+   Mobile-first: base rules target small screens, then widen
+   via min-width media queries for tablet / desktop.
+   ========================================================= */
+
+:root {
+  --ink: #16181d;
+  --dark: #353a45;
+  --mid: #68707e;
+  --line: #dde1e6;
+  --bg: #f5f6f8;
+  --card: #ffffff;
+  --accent: #2b4ced;
+  --accent-dark: #1d35b4;
+  --danger: #c0392b;
+  --warn: #c98a12;
+  --ok: #1f8a56;
+  --radius: 10px;
+  --shadow: 0 1px 2px rgba(20, 22, 30, 0.06), 0 6px 20px rgba(20, 22, 30, 0.05);
+  font-size: 16px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+img { max-width: 100%; display: block; }
+
+/* ---------------- Layout shell ---------------- */
+
+.site-header {
+  background: var(--ink);
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.site-header .inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0.85rem 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.brand {
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: 0.02em;
+  color: #fff;
+}
+.brand span { color: #9fb0ff; }
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 0.92rem;
+}
+.nav-links a { color: #d7dbe8; }
+.nav-links a:hover { color: #fff; }
+
+.btn-ghost {
+  border: 1px solid rgba(255,255,255,0.35);
+  border-radius: 7px;
+  padding: 0.35rem 0.8rem;
+  color: #fff !important;
+  /* Logout is a <button> inside a <form> (POST, so Spring Security's CSRF-protected
+     logout endpoint actually matches it) - these resets make it look identical to
+     the <a> links it sits next to in the nav bar. */
+  background: none;
+  cursor: pointer;
+  font: inherit;
+}
+.btn-ghost:hover { background: rgba(255,255,255,0.08); }
+
+main.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.4rem 1.2rem 3rem;
+}
+
+.site-footer {
+  text-align: center;
+  color: var(--mid);
+  font-size: 0.8rem;
+  padding: 1.6rem 1rem 2.4rem;
+}
+
+/* ---------------- Typography ---------------- */
+
+h1, h2, h3 { margin: 0 0 0.6rem; color: var(--ink); line-height: 1.25; }
+h1 { font-size: 1.7rem; }
+h2 { font-size: 1.25rem; }
+h3 { font-size: 1.05rem; }
+p { margin: 0 0 0.9rem; color: var(--dark); }
+.muted { color: var(--mid); font-size: 0.88rem; }
+
+/* ---------------- Cards / sections ---------------- */
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.2rem;
+  margin-bottom: 1.1rem;
+}
+
+.hero {
+  text-align: center;
+  padding: 2.4rem 1rem;
+}
+.hero h1 { font-size: 2rem; }
+.hero p { max-width: 42rem; margin-left: auto; margin-right: auto; }
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.9rem;
+  margin-top: 1.4rem;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.7rem;
+  margin-bottom: 1.2rem;
+}
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.9rem;
+  text-align: center;
+}
+.stat-card .num { font-size: 1.5rem; font-weight: 700; }
+.stat-card .label { font-size: 0.78rem; color: var(--mid); text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* ---------------- Forms ---------------- */
+
+.form-grid { display: grid; grid-template-columns: 1fr; gap: 0.9rem; }
+
+label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.3rem; }
+
+input[type="text"], input[type="email"], input[type="password"], input[type="tel"],
+select, textarea {
+  width: 100%;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  background: #fff;
+  color: var(--ink);
+}
+textarea { min-height: 7rem; resize: vertical; }
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(43,76,237,0.15);
+}
+
+input[type="file"] {
+  width: 100%;
+  padding: 0.5rem 0;
+  font-size: 0.88rem;
+}
+
+.field-error { color: var(--danger); font-size: 0.82rem; margin-top: 0.25rem; }
+.help-text { color: var(--mid); font-size: 0.8rem; margin-top: 0.25rem; }
+
+.btn {
+  display: inline-block;
+  border: none;
+  border-radius: 7px;
+  padding: 0.62rem 1.2rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--accent);
+  color: #fff;
+}
+.btn:hover { background: var(--accent-dark); }
+.btn-secondary { background: #fff; color: var(--ink); border: 1px solid var(--line); }
+.btn-secondary:hover { background: var(--bg); }
+.btn-row { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.4rem; }
+
+.filter-bar {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.6rem;
+  margin-bottom: 1.2rem;
+}
+.filter-bar select, .filter-bar input { font-size: 0.88rem; }
+
+/* ---------------- Complaint list ---------------- */
+
+.complaint-list { display: grid; gap: 0.8rem; }
+
+.complaint-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-left: 5px solid var(--mid);
+  border-radius: var(--radius);
+  padding: 0.95rem 1.1rem;
+  box-shadow: var(--shadow);
+}
+.complaint-card.priority-LOW { border-left-color: #8d98ab; }
+.complaint-card.priority-MEDIUM { border-left-color: var(--warn); }
+.complaint-card.priority-HIGH { border-left-color: #e07b1f; }
+.complaint-card.priority-URGENT { border-left-color: var(--danger); }
+
+.complaint-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+.complaint-title { font-weight: 700; font-size: 1rem; }
+.complaint-meta { font-size: 0.82rem; color: var(--mid); margin-top: 0.15rem; }
+.complaint-desc { margin-top: 0.5rem; font-size: 0.92rem; }
+
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+.badge-SUBMITTED { background: #e7e9ee; color: var(--dark); }
+.badge-ASSIGNED { background: #dde6ff; color: #1d35b4; }
+.badge-IN_PROGRESS { background: #fff1d6; color: #8a5c00; }
+.badge-RESOLVED { background: #d9f3e4; color: #15703f; }
+.badge-CLOSED { background: #16181d; color: #fff; }
+
+.badge-priority-LOW { background: #eef0f3; color: var(--dark); }
+.badge-priority-MEDIUM { background: #fff1d6; color: #8a5c00; }
+.badge-priority-HIGH { background: #ffe3cf; color: #9a4a0a; }
+.badge-priority-URGENT { background: #fbdbd6; color: var(--danger); }
+
+/* ---------------- Lifecycle tracker ---------------- */
+
+.lifecycle {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 1rem 0;
+}
+.lifecycle-step {
+  display: flex;
+  gap: 0.8rem;
+  padding-bottom: 1rem;
+  position: relative;
+}
+.lifecycle-step:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 0.55rem;
+  top: 1.4rem;
+  bottom: 0;
+  width: 2px;
+  background: var(--line);
+}
+.lifecycle-dot {
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 50%;
+  background: var(--line);
+  flex: none;
+  margin-top: 0.15rem;
+}
+.lifecycle-step.done .lifecycle-dot { background: var(--accent); }
+.lifecycle-time { font-size: 0.78rem; color: var(--mid); }
+
+/* ---------------- Evidence photo ---------------- */
+
+.evidence-thumb {
+  margin-top: 0.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  max-width: 260px;
+}
+
+/* ---------------- Table (admin, desktop only) ---------------- */
+
+table.data-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+table.data-table th, table.data-table td {
+  text-align: left;
+  padding: 0.55rem 0.6rem;
+  border-bottom: 1px solid var(--line);
+}
+table.data-table th { color: var(--mid); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.03em; }
+
+/* ---------------- Auth pages ---------------- */
+
+.auth-wrap {
+  max-width: 420px;
+  margin: 2.2rem auto;
+}
+.auth-wrap .card { padding: 1.6rem; }
+.auth-switch { text-align: center; margin-top: 0.8rem; font-size: 0.9rem; }
+
+.alert {
+  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  font-size: 0.88rem;
+  margin-bottom: 1rem;
+}
+.alert-success { background: #d9f3e4; color: #15703f; }
+.alert-error { background: #fbdbd6; color: var(--danger); }
+
+/* =========================================================
+   Breakpoints — this is the same "one codebase, three
+   breakpoints" idea from the project's responsive design.
+   ========================================================= */
+
+@media (min-width: 600px) {
+  .feature-grid { grid-template-columns: repeat(2, 1fr); }
+  .stat-grid { grid-template-columns: repeat(3, 1fr); }
+  .filter-bar { grid-template-columns: repeat(4, 1fr) auto; align-items: end; }
+}
+
+@media (min-width: 1024px) {
+  .feature-grid { grid-template-columns: repeat(3, 1fr); }
+  .stat-grid { grid-template-columns: repeat(5, 1fr); }
+  .form-grid.two-col { grid-template-columns: 1fr 1fr; }
+  .lifecycle { flex-direction: row; }
+  .lifecycle-step { flex-direction: column; flex: 1; padding-bottom: 0; }
+  .lifecycle-step:not(:last-child)::before {
+    left: 1.4rem; right: -50%; top: 0.55rem; bottom: auto; height: 2px; width: auto;
+  }
+}

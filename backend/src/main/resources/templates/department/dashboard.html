@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title th:text="${department.name} + ' Queue — FixMyCampus'">My Queue</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="container">
+        <h1 th:text="${department.name}">Department</h1>
+        <p class="muted">Every complaint currently assigned to your department. Open one to update its status.</p>
+
+        <div class="complaint-list" th:if="${not #lists.isEmpty(complaints)}">
+            <a th:each="c : ${complaints}" th:href="@{/department/complaints/{id}(id=${c.id})}"
+               th:class="'complaint-card priority-' + ${c.priority}" style="display:block;color:inherit">
+                <div class="complaint-top">
+                    <div>
+                        <div class="complaint-title" th:text="${c.category} + ' — ' + ${c.location}"></div>
+                        <div class="complaint-meta"
+                             th:text="${c.student.name} + ' · ' + ${#temporals.format(c.dateReported, 'dd MMM yyyy, HH:mm')}"></div>
+                    </div>
+                    <div>
+                        <span th:class="'badge badge-' + ${c.status}" th:text="${c.status}"></span>
+                        <span th:class="'badge badge-priority-' + ${c.priority}" th:text="${c.priority}"></span>
+                    </div>
+                </div>
+                <div class="complaint-desc" th:text="${c.description}"></div>
+            </a>
+        </div>
+
+        <div class="card" th:if="${#lists.isEmpty(complaints)}">
+            <p class="muted" style="margin:0">Nothing assigned to your department right now.</p>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>
