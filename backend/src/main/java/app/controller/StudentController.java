@@ -5,6 +5,7 @@ import app.model.Category;
 import app.model.ComplaintStatus;
 import app.model.Priority;
 import app.model.User;
+import app.repository.UserRepository;
 import app.service.ComplaintService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,11 +21,16 @@ import org.springframework.web.bind.annotation.*;
 public class StudentController {
 
     private final ComplaintService complaintService;
+    private final UserRepository userRepository;
 
     /** Dashboard: every complaint this student has filed, newest first. */
     @GetMapping("/dashboard")
     public String dashboard(@AuthenticationPrincipal User student, Model model) {
-        model.addAttribute("complaints", complaintService.myComplaints(student));
+        if (student == null) {
+            return "redirect:/login";
+        }
+        User currentStudent = userRepository.findById(student.getId()).orElse(student);
+        model.addAttribute("complaints", complaintService.myComplaints(currentStudent));
         model.addAttribute("categories", Category.values());
         model.addAttribute("statuses", ComplaintStatus.values());
         model.addAttribute("priorities", Priority.values());
@@ -39,7 +45,9 @@ public class StudentController {
                           @RequestParam(required = false) Priority priority,
                           @RequestParam(required = false) String keyword,
                           Model model) {
-
+        if (student == null) {
+            return "redirect:/login";
+        }
         model.addAttribute("complaints",
                 complaintService.search(student.getId(), category, status, priority, null, keyword));
         model.addAttribute("categories", Category.values());
@@ -49,7 +57,10 @@ public class StudentController {
     }
 
     @GetMapping("/complaints/new")
-    public String newComplaintForm(Model model) {
+    public String newComplaintForm(@AuthenticationPrincipal User student, Model model) {
+        if (student == null) {
+            return "redirect:/login";
+        }
         model.addAttribute("complaintForm", new ComplaintForm());
         model.addAttribute("categories", Category.values());
         model.addAttribute("priorities", Priority.values());
@@ -61,20 +72,27 @@ public class StudentController {
                                    @Valid @ModelAttribute ComplaintForm complaintForm,
                                    BindingResult bindingResult,
                                    Model model) {
+        if (student == null) {
+            return "redirect:/login";
+        }
         if (bindingResult.hasErrors()) {
             model.addAttribute("categories", Category.values());
             model.addAttribute("priorities", Priority.values());
             return "student/report-form";
         }
-        complaintService.submit(complaintForm, student);
+        User currentStudent = userRepository.findById(student.getId()).orElse(student);
+        complaintService.submit(complaintForm, currentStudent);
         return "redirect:/student/dashboard";
     }
 
     /** Full lifecycle history for one of the student's own complaints. */
     @GetMapping("/complaints/{id}")
     public String viewComplaint(@AuthenticationPrincipal User student, @PathVariable Long id, Model model) {
+        if (student == null) {
+            return "redirect:/login";
+        }
         var complaint = complaintService.get(id);
-        if (!complaint.getStudent().getId().equals(student.getId())) {
+        if (complaint == null || complaint.getStudent() == null || !complaint.getStudent().getId().equals(student.getId())) {
             return "redirect:/student/dashboard";
         }
         model.addAttribute("complaint", complaint);
@@ -82,3 +100,4 @@ public class StudentController {
         return "student/complaint-detail";
     }
 }
+

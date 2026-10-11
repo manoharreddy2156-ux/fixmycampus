@@ -27,7 +27,7 @@ public class StatusLog {
     @JoinColumn(name = "complaint_id", nullable = false)
     private Complaint complaint;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "updated_by", nullable = false)
     private User updatedBy;
 

@@ -50,7 +50,7 @@ public class User implements UserDetails {
     private Role role;
 
     /** Only set (and only meaningful) for DEPARTMENT_STAFF accounts. */
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "department_id")
     private Department department;
 

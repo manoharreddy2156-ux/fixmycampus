@@ -1,13 +1,17 @@
 package app.controller;
 
 import app.model.ComplaintStatus;
+import app.model.Department;
 import app.model.User;
+import app.repository.UserRepository;
 import app.service.ComplaintService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collections;
 
 /**
  * The queue for one department's staff - only complaints assigned to their own
@@ -20,19 +24,37 @@ import org.springframework.web.bind.annotation.*;
 public class DepartmentController {
 
     private final ComplaintService complaintService;
+    private final UserRepository userRepository;
 
     @GetMapping("/dashboard")
     public String dashboard(@AuthenticationPrincipal User deptStaff, Model model) {
-        model.addAttribute("department", deptStaff.getDepartment());
-        model.addAttribute("complaints", complaintService.forDepartment(deptStaff.getDepartment().getId()));
+        if (deptStaff == null) {
+            return "redirect:/login";
+        }
+        User staff = userRepository.findById(deptStaff.getId()).orElse(deptStaff);
+        Department dept = staff.getDepartment();
+        if (dept == null) {
+            model.addAttribute("department", new Department(null, "Unassigned", "N/A"));
+            model.addAttribute("complaints", Collections.emptyList());
+            return "department/dashboard";
+        }
+        model.addAttribute("department", dept);
+        model.addAttribute("complaints", complaintService.forDepartment(dept.getId()));
         return "department/dashboard";
     }
 
     @GetMapping("/complaints/{id}")
     public String viewComplaint(@AuthenticationPrincipal User deptStaff, @PathVariable Long id, Model model) {
+        if (deptStaff == null) {
+            return "redirect:/login";
+        }
+        User staff = userRepository.findById(deptStaff.getId()).orElse(deptStaff);
+        if (staff.getDepartment() == null) {
+            return "redirect:/department/dashboard";
+        }
         var complaint = complaintService.get(id);
-        if (complaint.getDepartment() == null
-                || !complaint.getDepartment().getId().equals(deptStaff.getDepartment().getId())) {
+        if (complaint == null || complaint.getDepartment() == null
+                || !complaint.getDepartment().getId().equals(staff.getDepartment().getId())) {
             return "redirect:/department/dashboard";
         }
         model.addAttribute("complaint", complaint);
@@ -45,8 +67,12 @@ public class DepartmentController {
                                 @RequestParam ComplaintStatus status,
                                 @RequestParam(required = false) String remarks,
                                 Model model) {
+        if (deptStaff == null) {
+            return "redirect:/login";
+        }
+        User staff = userRepository.findById(deptStaff.getId()).orElse(deptStaff);
         try {
-            complaintService.updateStatusByDepartment(id, status, remarks, deptStaff);
+            complaintService.updateStatusByDepartment(id, status, remarks, staff);
         } catch (IllegalArgumentException e) {
             // Ownership/status-transition guard tripped - send them back to their own queue
             // rather than exposing a stack trace; this shouldn't normally happen since the
@@ -55,3 +81,4 @@ public class DepartmentController {
         return "redirect:/department/complaints/" + id;
     }
 }
+
