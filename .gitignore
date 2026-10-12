@@ -23,3 +23,9 @@ Thumbs.db
 
 # Local env overrides
 application-local.properties
+
+# Node / Frontend
+**/node_modules/
+**/dist/
+.npm
+
