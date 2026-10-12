@@ -22,23 +22,23 @@ services:
         value: /app/uploads
 
   # ==========================================================
-  # 2. React Frontend (Static Site - Free & Global CDN)
+  # 2. React Frontend (Static Site - Free & Fast Global CDN)
   # ==========================================================
   - type: web
     name: fixmycampus-frontend
-    runtime: static
+    env: static
     plan: free
     region: oregon
     rootDir: frontend
     buildCommand: npm install && npm run build
-    staticPublishPath: dist
+    staticPublishPath: ./dist
     routes:
+      - type: rewrite
+        source: /api/*
+        destination: https://fixmycampus-backend.onrender.com/api/*
+      - type: rewrite
+        source: /uploads/*
+        destination: https://fixmycampus-backend.onrender.com/uploads/*
       - type: rewrite
         source: /*
         destination: /index.html
-    envVars:
-      - key: VITE_API_URL
-        fromService:
-          type: web
-          name: fixmycampus-backend
-          envVarKey: RENDER_EXTERNAL_URL
